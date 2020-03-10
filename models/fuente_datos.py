@@ -10,7 +10,7 @@ if False:
 # For interactive work (on ipython) it's easier to work with explicit objects
 # instead of contexts.
 # Create an SSH tunnel
-def test_tunel():
+def marcadas_tunel_latix():
     tunnel = SSHTunnelForwarder(
         (configuration.get('datos.ssh_host'),
          configuration.get('datos.ssh_port')),
@@ -23,22 +23,23 @@ def test_tunel():
     tunnel.start()
     # Create a database connection
     conn = psycopg2.connect(
-        database='<database>',
-        user='<db_user>',
+        database=configuration.get('datos.db_name'),
+        user=configuration.get('datos.db_user'),
+        password=configuration.get('datos.db_pass'),
         host=tunnel.local_bind_host,
         port=tunnel.local_bind_port,
     )
     # Get a database cursor
     cur = conn.cursor()
     # Execute SQL
-    cur.execute("""SQL-Statements;""")
+    cur.execute("""select * from attendance_record;""")
     # Get the result
     result = cur.fetchall()
-    print(result)
     # Close connections
     conn.close()
     # Stop the tunnel
     tunnel.stop()
+    return result
 
 # en appconfig.ini
 # [datos]
@@ -46,3 +47,6 @@ def test_tunel():
 # ssh_port = 
 # ssh_user = 
 # ssh_pass = 
+# db_name = 
+# db_user = 
+# db_pass = 

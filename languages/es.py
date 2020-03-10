@@ -173,6 +173,7 @@
 'End of impersonation': 'Fin de suplantación',
 'enter a number between %(min)g and %(max)g': 'introduzca un numero entre %(min)g y %(max)g',
 'enter a value': 'introduzca un valor',
+'Enter a value': 'Enter a value',
 'enter an integer between %(min)g and %(max)g': 'introduzca un número entero entre %(min)g y %(max)g',
 'enter date and time as %(format)s': 'introduzca fecha y hora como %(format)s',
 'Error logs for "%(app)s"': 'Bitácora de errores para "%(app)s"',
