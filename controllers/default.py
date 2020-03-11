@@ -7,11 +7,11 @@
 # for ide
 if False:
     from db import db
-    from gluon import response, request, auth, cache
-    from gluon import HTTP, CENTER, FORM, DIV, I
+    from gluon import response, request, auth, cache, redirect
+    from gluon import HTTP, CENTER, FORM, DIV, I, A, URL, H4
     from gluon import SQLFORM
     from log import log
-    from html_helper import grand_button
+    from html_helper import grand_button, icon_title
 
 # ---- example index page ----
 
@@ -32,48 +32,7 @@ def index():
                              'fa-truck'),
                 _id='mini_grid'),
             _id='indexdiv'),
-        DIV(I(' Produccion', _class='fa fa-industry fa-2x',
-              _id='tit_minigrid'),
-            DIV(grand_button('ingreso productos terminados',
-                             'ingreso_produccion',
-                             'fa-database'),
-                grand_button('consulta productos',
-                             'consulta_ingreso_stock',
-                             'fa-list'),
-                grand_button('Ingreso materias primas',
-                             'admin_tabla',
-                             'fa-qrcode',
-                             vars={'tabla': 'mat_primas'}),
-                _id='mini_grid'),
-            _id='indexdiv'),
-        DIV(I(' Compras', _class='fa fa-shopping-bag fa-2x',
-              _id='tit_minigrid'),
-            DIV(grand_button('ingreso productos terminados',
-                             'ingreso_produccion',
-                             'fa-database'),
-                grand_button('consulta productosNN',
-                             'consulta_ingreso_stock',
-                             'fa-list'),
-                grand_button('Ingreso materias primasNN',
-                             'admin_tabla',
-                             'fa-qrcode',
-                             vars={'tabla': 'mat_primas'}),
-                _id='mini_grid'),
-            _id='indexdiv'),
-        DIV(I(' Contabilidad', _class='fa fa-calculator fa-2x',
-              _id='tit_minigrid'),
-            DIV(grand_button('IngresosNN',
-                             'ingresos',
-                             'fa-download'),
-                grand_button('EgresosNN',
-                             'consulta_ingreso_stock',
-                             'fa-upload'),
-                grand_button('ConsultaNN',
-                             'admin_tabla',
-                             'fa-university',
-                             vars={'tabla': 'mat_primas'}),
-                _id='mini_grid'),
-            _id='indexdiv'),
+        
         _id='panel_grid'))
     return dict(form=form)
 
@@ -124,3 +83,30 @@ def download():
     http://..../[app]/default/download/[filename]
     """
     return response.download(request, db)
+
+
+def opt_tabla(tabla):
+    if tabla == 'cliente':
+        fields = ('db.cliente.id, db.cliente.nombre,' +
+                  'db.cliente.razon_social,' + 'db.cliente.lista,' +
+                  'db.cliente.saldo, db.cliente.tipocuenta, db.cliente.cuit')
+    else:
+        fields = 'None'
+    return {'fields': fields}
+
+
+def admin_tabla():
+    if 'tabla' in request.vars:
+        tabla = request.vars['tabla']
+        titulo = DIV(
+            A(icon_title('fa-arrow-left', 'Volver'), _id='boton_r',
+              _class="btn-grid", _href=URL('admin')),
+            CENTER(H4('Admin ' + (str(tabla).title()))))
+        log('acceso grid ' + str(tabla))
+        grid = SQLFORM.smartgrid(eval('db.' + str(tabla)),
+                                 maxtextlength=20,
+                                 linked_tables=['child'],
+                                 fields=eval(opt_tabla(tabla)['fields']))
+        return dict(grid=grid, titulo=titulo)
+    else:
+        redirect(URL('index'))

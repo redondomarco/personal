@@ -1,6 +1,10 @@
 # -*- coding: utf-8 -*-
 # this file is released under public domain and you can use without limitations
 
+# for ide
+if False:
+    from db import configuration
+
 # ----------------------------------------------------------------------------------------------------------------------
 # this is the main application menu add/remove items as required
 # ----------------------------------------------------------------------------------------------------------------------
