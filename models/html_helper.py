@@ -2,7 +2,10 @@
 
 # for ide
 if False:
-    from gluon import I, SPAN, BR, DIV, A, TABLE, URL
+    from gluon import I, SPAN, BR, DIV, A, TABLE, URL, H4, CENTER
+    from gluon import request, redirect
+    from gluon import SQLFORM
+    from log import log
 
 
 def icon_title(icon, title):
@@ -26,3 +29,30 @@ def grand_button(nombre, link, icono, **kwargs):
               _class="btn-square-blue",
               _href=url)
     return boton
+
+
+def opt_tabla(tabla):
+    if tabla == 'cliente':
+        fields = ('db.cliente.id, db.cliente.nombre,' +
+                  'db.cliente.razon_social,' + 'db.cliente.lista,' +
+                  'db.cliente.saldo, db.cliente.tipocuenta, db.cliente.cuit')
+    else:
+        fields = 'None'
+    return {'fields': fields}
+
+
+def admin_tabla():
+    if 'tabla' in request.vars:
+        tabla = request.vars['tabla']
+        titulo = DIV(
+            A(icon_title('fa-arrow-left', 'Volver'), _id='boton_r',
+              _class="btn-grid", _href=URL('admin')),
+            CENTER(H4('Admin ' + (str(tabla).title()))))
+        log('acceso grid ' + str(tabla))
+        grid = SQLFORM.smartgrid(eval('db.' + str(tabla)),
+                                 maxtextlength=20,
+                                 linked_tables=['child'],
+                                 fields=eval(opt_tabla(tabla)['fields']))
+        return dict(grid=grid, titulo=titulo)
+    else:
+        redirect(URL('index'))

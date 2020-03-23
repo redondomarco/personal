@@ -15,6 +15,7 @@ if False:
 
 # ---- example index page ----
 
+
 def index():
     log('acceso')
     # menu favoritos
@@ -23,7 +24,8 @@ def index():
             _id='tit_minigrid'),
             DIV(grand_button('empleados',
                              'admin_tabla',
-                             'fa-cart-plus'),
+                             'fa-cart-plus',
+                             vars={'tabla': 'empleado'}),
                 grand_button('ver marcadas',
                              'admin_tabla',
                              'fa-th-large'),
@@ -32,29 +34,36 @@ def index():
                              'fa-truck'),
                 _id='mini_grid'),
             _id='indexdiv'),
-        
+
         _id='panel_grid'))
     return dict(form=form)
 
+
 # ---- API (example) -----
-@auth.requires_login()
-def api_get_user_email():
-    if not request.env.request_method == 'GET': raise HTTP(403)
-    return response.json({'status':'success', 'email':auth.user.email})
+# @auth.requires_login()
+# def api_get_user_email():
+    # if not request.env.request_method == 'GET': raise HTTP(403)
+    # return response.json({'status': 'success', 'email': auth.user.email})
+
 
 # ---- Smart Grid (example) -----
-@auth.requires_membership('admin') # can only be accessed by members of admin groupd
-def grid():
-    response.view = 'generic.html' # use a generic view
-    tablename = request.args(0)
-    if not tablename in db.tables: raise HTTP(403)
-    grid = SQLFORM.smartgrid(db[tablename], args=[tablename], deletable=False, editable=False)
-    return dict(grid=grid)
+# can only be accessed by members of admin groupd
+# @auth.requires_membership('admin')
+# def grid():
+    # use a generic view
+    # response.view = 'generic.html'
+    # tablename = request.args(0)
+    # if not tablename in db.tables: raise HTTP(403)
+    # grid = SQLFORM.smartgrid(db[tablename],
+    #                          args=[tablename],
+    #                          deletable=False,
+    #                          editable=False)
+    # return dict(grid=grid)
 
 # ---- Embedded wiki (example) ----
-def wiki():
-    auth.wikimenu() # add the wiki to the menu
-    return auth.wiki() 
+# def wiki():
+    # auth.wikimenu() # add the wiki to the menu
+    # return auth.wiki()
 
 # ---- Action for login/register/etc (required for auth) -----
 def user():
@@ -71,9 +80,11 @@ def user():
         @auth.requires_membership('group name')
         @auth.requires_permission('read','table name',record_id)
     to decorate functions that need access control
-    also notice there is http://..../[app]/appadmin/manage/auth to allow administrator to manage users
+    also notice there is http://..../[app]/appadmin/manage/auth to
+    allow administrator to manage users
     """
     return dict(form=auth())
+
 
 # ---- action to server uploaded static content (required) ---
 @cache.action()

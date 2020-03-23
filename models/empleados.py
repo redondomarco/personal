@@ -1,18 +1,14 @@
 # -*- coding: utf-8 -*-
 
-#for ide
+# for ide
 if False:
     from gluon import Field, auth
     from gluon.validators import IS_IN_SET
     from db import db
     from fuente_datos import marcadas_tunel_latix
 
-dias_semana = ['Lunes',
-                'Martes',
-                'Miercoles',
-                'Jueves',
-                'Viernes',
-                'Sabado']
+dias_semana = ['Lunes', 'Martes', 'Miercoles', 'Jueves',
+               'Viernes', 'Sabado']
 
 db.define_table(
     'marcadas',
