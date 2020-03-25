@@ -7,11 +7,16 @@
 # for ide
 if False:
     from db import db
-    from gluon import response, request, auth, cache, redirect
-    from gluon import HTTP, CENTER, FORM, DIV, I, A, URL, H4
+    from gluon import response, request, auth, cache, redirect, session
+    from gluon import CENTER, FORM, DIV, I, A, URL, H3, H4, BR, TAG, INPUT
+    from gluon import TABLE, TR
+    from gluon import SELECT
     from gluon import SQLFORM
+    from gluon.validators import IS_NOT_EMPTY
     from log import log
     from html_helper import grand_button, icon_title
+    from empleados import aplico_politica
+    from util import list_dict_to_table_sortable
 
 # ---- example index page ----
 
@@ -121,3 +126,53 @@ def admin_tabla():
         return dict(grid=grid, titulo=titulo)
     else:
         redirect(URL('index'))
+
+
+def informe_mes_empleado():
+    empleados = db(db.empleado.is_active is True).select(db.empleado.ALL)
+    fempl = ([" "] +
+             [f"{p.user_code} {p.nombre} {p.apellido}" for p in empleados])
+    form = FORM(CENTER(
+            H4('Marcadas del personal'),
+            TABLE(TR(TAG('<label class "control-label">Persona</label>'),
+                     SELECT(fempl, _name='fempleado', _type='text',
+                            _id="persona", _class="form-control string")),
+                  TR(TAG('<label class "control-label">Periodo desde</label>'),
+                     INPUT(_name='fdesde', _type='date', _id="mesanio",
+                           _class="form-control string",
+                           requires=IS_NOT_EMPTY())),
+                  TR(TAG('<label class "control-label">Periodo hasta</label>'),
+                     INPUT(_name='fhasta', _type='date', _id="mesanio",
+                           _class="form-control string",))),
+            BR(),
+            INPUT(_type="submit", _class="btn btn-primary btn-medium",
+                  _value='Continuar')
+        ))
+    if form.accepts(request, session):
+        session.empleado = request.vars['fempleado']
+        session.user_code = request.vars['fempleado'].split()[0]
+        session.fdesde = request.vars['fdesde']
+        session.fhasta = request.vars['fhasta']
+        log(f"seleccionado {session.empleado}")
+        log(f"desde: {session.fdesde} hasta {session.fhasta}")
+        # selector = (db.empleado.user_code == user_code)
+        # usuario = db(selector).select().first().as_dict()
+        session.tdesde = datetime.datetime.strptime(session.fdesde, '%Y-%m-%d')
+        session.thasta = datetime.datetime.strptime(session.fhasta, '%Y-%m-%d')
+        lista = aplico_politica(session.user_code,
+                                session.fdesde,
+                                session.fhasta)
+        nombre_archivo = f'''{session.empleado}
+        -{session.fdesde}-{session.fhasta}'''
+        session.table = list_dict_to_table_sortable(lista, nombre_archivo)
+        redirect(URL('informe'))
+    else:
+        log(f'acceso {request.function}')
+    return dict(form=form)
+
+
+def informe():
+    form = CENTER(H5(session.empleado),
+                  PRE(f'Desde: {fecha_sp(session.tdesde)} Hasta: {fecha_sp(session.thasta)}'),
+                  session.table)
+    return dict(form=form)

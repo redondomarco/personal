@@ -26,5 +26,5 @@ def log(palabra):
         for i in log_remove:
             mensaje = mensaje.replace(str(i), '')
     else:
-        mensaje = 'usuario: admin {palabra}'
+        mensaje = f'usuario: admin {palabra}'
     logger.info(mensaje)
